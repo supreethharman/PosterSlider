@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         posterSlider =  findViewById(R.id.poster_slider);
         emptyTextView =  findViewById(R.id.emptyTextView);
+        emptyTextView.setText("Loading files...!");
 
         /*List<Poster> posters = new ArrayList<>();
         posters.add(new DrawableImage(R.drawable.logo));
@@ -299,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
         if (files == null) {
             Toast.makeText(getApplicationContext(), "No files", Toast.LENGTH_LONG).show();
             posterSlider.setVisibility(View.GONE);
-            emptyTextView.setVisibility(View.VISIBLE);
             return;
         } else {
             Arrays.sort(files);
