@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">SignagePlayer</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="serverKey">serverKey</string>
+    <string name="storeId">storeId</string>
+    <string name="serverAddress">serverAddress</string>
+    <string name="isLoggedIn">isLoggedIn</string>
+    <string name="sharedPrefsFile">sharedPrefsFile</string>
+    <string name="hardwareKey">hardwareKey</string>
+    <string name="displayName">displayName</string>
+    <string name="latestAssetFile">latestAssetFile</string>
+    <string name="serverIpAddress">http://13.232.40.50:8081</string>
+    <string name="no_files">Sorry! there are no files for display.</string>
+</resources>
