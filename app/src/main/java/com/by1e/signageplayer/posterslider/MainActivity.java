@@ -50,6 +50,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean IS_DOWNLOADING = false;
     private Handler scheduleHandler;
     private Runnable apiRunnable;
+    ScheduledExecutorService scheduleTaskExecutor;
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             if (mProgressDialog != null) {
@@ -137,12 +141,13 @@ public class MainActivity extends AppCompatActivity {
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         posterSlider =  findViewById(R.id.poster_slider);
         emptyTextView =  findViewById(R.id.emptyTextView);
-        emptyTextView.setText(R.string.no_content_to_display);
+        emptyTextView.setText(R.string.no_files);
 
         //Removed default slider initialization
         /*List<Poster> posters = new ArrayList<>();
         posters.add(new DrawableImage(R.drawable.logo));
         posterSlider.setPosters(posters);*/
+        scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
 
         if (isNetworkAvailable()) {
             SharedPreferences prefs = getSharedPreferences(getString(R.string.sharedPrefsFile), MODE_PRIVATE);
@@ -155,16 +160,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkForUpdates() {
-        apiRunnable = new Runnable() {
+        scheduleTaskExecutor.schedule(new Runnable() {
             @Override
             public void run() {
                 if (isNetworkAvailable()) {
+                    Log.d("@@@checkForUpdates@@@", "Network will be made");
                     MainActivity.DownloadAssets runner = new MainActivity.DownloadAssets();
                     runner.execute(ServerAddress + "/lf");
                 }
             }
-        };
-        scheduleHandler.postDelayed(apiRunnable, 1000);
+        }, 1, TimeUnit.MINUTES);
     }
 
     @Override
@@ -380,11 +385,12 @@ public class MainActivity extends AppCompatActivity {
                 ServerKey = prefs.getString(getString(R.string.serverKey), null);
                 StoreID = prefs.getString((getString(R.string.storeId)), null);
                 HardwareKey = prefs.getString(getString(R.string.hardwareKey), null);
+                String uniqueIdentifier = "android" + "-" + StoreID;
 
                 JSONObject requestData = new JSONObject();
                 requestData.put("serverKey", ServerKey);
                 requestData.put("hardwareKey", HardwareKey);
-                requestData.put("displayName", StoreID + "-" + HardwareKey);
+                requestData.put("displayName", uniqueIdentifier);
                 requestData.put("clientType", "AndroidDisplay");
                 requestData.put("clientVersion", Integer.toString(BuildConfig.VERSION_CODE));
                 requestData.put("clientCode", 1);

@@ -101,7 +101,6 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-
     private class AsyncTaskRunner extends AsyncTask<String, String, String> {
 
         ProgressDialog progressDialog;
@@ -122,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 JSONObject requestData = new JSONObject();
                 requestData.put("serverKey", serverKeyVal);
-                requestData.put("hardwareKey", uniqueIdentifier);
+                requestData.put("hardwareKey", storeIdVal);
                 requestData.put("displayName", uniqueIdentifier);
                 requestData.put("clientType", "AndroidDisplay");
                 requestData.put("clientVersion", Integer.toString(BuildConfig.VERSION_CODE));
@@ -133,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 SharedPreferences sharedPref = getSharedPreferences(getString(R.string.sharedPrefsFile), Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.hardwareKey), uniqueIdentifier);
+                editor.putString(getString(R.string.hardwareKey), storeIdVal);
                 editor.putString(getString(R.string.displayName), uniqueIdentifier);
                 editor.putString(getString(R.string.storeId), storeIdVal);
                 editor.putString(getString(R.string.serverAddress), serverAddressVal);
