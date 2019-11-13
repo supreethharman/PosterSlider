@@ -50,6 +50,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -72,14 +74,13 @@ public class MainActivity extends AppCompatActivity {
     private CacheHelper ch = CacheHelper.getInstance();
     private String ServerAddress;
     private String HardwareKey;
-    private String ServerKey;
-    private String StoreID;
     private String LatestAssetFile;
     private boolean LOADED_FILES = false;
     private boolean IS_DOWNLOADING = false;
     private Handler scheduleHandler;
     private Runnable apiRunnable;
     ScheduledExecutorService scheduleTaskExecutor;
+    Timer timerAsync;
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             if (mProgressDialog != null) {
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
         posters.add(new DrawableImage(R.drawable.logo));
         posterSlider.setPosters(posters);*/
         scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
+        timerAsync = new Timer();
 
         if (isNetworkAvailable()) {
             SharedPreferences prefs = getSharedPreferences(getString(R.string.sharedPrefsFile), MODE_PRIVATE);
@@ -160,16 +162,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkForUpdates() {
-        scheduleTaskExecutor.schedule(new Runnable() {
+        //TODO: keep timer async task as backup
+        /*TimerTask timerTaskAsync = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        Log.d("repeat","after each 10 sec");
+                    }
+                });
+            }
+        };
+        timerAsync.schedule(timerTaskAsync, 0, 10000);*/
+        apiRunnable = new Runnable() {
             @Override
             public void run() {
                 if (isNetworkAvailable()) {
                     Log.d("@@@checkForUpdates@@@", "Network will be made");
                     MainActivity.DownloadAssets runner = new MainActivity.DownloadAssets();
                     runner.execute(ServerAddress + "/lf");
+                } else {
+                    Log.d("@@@checkForUpdates@@@", "No Network");
                 }
             }
-        }, 1, TimeUnit.MINUTES);
+        };
+
+        scheduleTaskExecutor.scheduleAtFixedRate(apiRunnable, 0, 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -330,8 +348,8 @@ public class MainActivity extends AppCompatActivity {
             posterSlider.setPosters(posters);
         }
 
-        //deleteFilesWithPrefix(new File(targetDir + "/cache/"), HardwareKey);
         LOADED_FILES = true;
+        restartApp();
     }
 
 
@@ -382,8 +400,8 @@ public class MainActivity extends AppCompatActivity {
                 String url = params[0];
 
                 SharedPreferences prefs = getSharedPreferences(getString(R.string.sharedPrefsFile), MODE_PRIVATE);
-                ServerKey = prefs.getString(getString(R.string.serverKey), null);
-                StoreID = prefs.getString((getString(R.string.storeId)), null);
+                String ServerKey = prefs.getString(getString(R.string.serverKey), null);
+                String StoreID = prefs.getString((getString(R.string.storeId)), null);
                 HardwareKey = prefs.getString(getString(R.string.hardwareKey), null);
                 String uniqueIdentifier = "android" + "-" + StoreID;
 
