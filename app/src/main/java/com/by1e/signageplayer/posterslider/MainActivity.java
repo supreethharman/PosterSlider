@@ -324,11 +324,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
         File[] files = directory.listFiles();
         if (files == null) {
-            Toast.makeText(getApplicationContext(), "No files", Toast.LENGTH_LONG).show();
-            List<Poster> posters = new ArrayList<>();
-            posters.add(new DrawableImage(R.drawable.logo));
-            posterSlider.setPosters(posters);
-            return;
+            Toast.makeText(getApplicationContext(), getString(R.string.no_files), Toast.LENGTH_LONG).show();
         } else {
             Arrays.sort(files);
             List<Poster> posters = new ArrayList<>();

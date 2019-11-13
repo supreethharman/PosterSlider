@@ -17,7 +17,7 @@
         app:hideIndicators="true"
         app:loopSlides="true"
         android:background="@color/bgColor"
-        android:visibility="gone"
+        android:visibility="visible"
         tools:visibility="gone"/>
 
 
