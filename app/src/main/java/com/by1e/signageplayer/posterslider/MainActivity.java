@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.asura.library.posters.DrawableImage;
 import com.asura.library.posters.Poster;
 import com.asura.library.posters.RemoteImage;
 import com.asura.library.posters.RemoteVideo;
@@ -141,9 +142,10 @@ public class MainActivity extends AppCompatActivity {
         emptyTextView = findViewById(R.id.emptyTextView);
 
         //Removed default slider initialization
-        /*List<Poster> posters = new ArrayList<>();
+        List<Poster> posters = new ArrayList<>();
         posters.add(new DrawableImage(R.drawable.logo));
-        posterSlider.setPosters(posters);*/
+        posterSlider.setPosters(posters);
+
         scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
         timerAsync = new Timer();
 
@@ -323,8 +325,9 @@ public class MainActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         if (files == null) {
             Toast.makeText(getApplicationContext(), "No files", Toast.LENGTH_LONG).show();
-            emptyTextView.setText(R.string.no_files);
-            posterSlider.setVisibility(View.GONE);
+            List<Poster> posters = new ArrayList<>();
+            posters.add(new DrawableImage(R.drawable.logo));
+            posterSlider.setPosters(posters);
             return;
         } else {
             Arrays.sort(files);
