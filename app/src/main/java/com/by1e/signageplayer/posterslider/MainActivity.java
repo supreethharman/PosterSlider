@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 unzip(new File(Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DOWNLOADS + "/cache/" + LatestAssetFile), new File(targetDir + "/gallery/"));
                 loadFiles();
-                restartApp();
+                //restartApp();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         posterSlider = findViewById(R.id.poster_slider);
         emptyTextView = findViewById(R.id.emptyTextView);
-        emptyTextView.setText(R.string.no_files);
 
         //Removed default slider initialization
         /*List<Poster> posters = new ArrayList<>();
@@ -324,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         if (files == null) {
             Toast.makeText(getApplicationContext(), "No files", Toast.LENGTH_LONG).show();
+            emptyTextView.setText(R.string.no_files);
             posterSlider.setVisibility(View.GONE);
             return;
         } else {
