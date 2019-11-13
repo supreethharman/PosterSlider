@@ -27,7 +27,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asura.library.posters.DrawableImage;
 import com.asura.library.posters.Poster;
 import com.asura.library.posters.RemoteImage;
 import com.asura.library.posters.RemoteVideo;
@@ -51,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(ctxt, "Ummmm...hi!", Toast.LENGTH_LONG).show();
         }
     };
+    ScheduledExecutorService scheduleTaskExecutor;
+    Timer timerAsync;
     private PosterSlider posterSlider;
     private TextView emptyTextView;
     private DownloadManager mgr = null;
@@ -77,10 +77,6 @@ public class MainActivity extends AppCompatActivity {
     private String LatestAssetFile;
     private boolean LOADED_FILES = false;
     private boolean IS_DOWNLOADING = false;
-    private Handler scheduleHandler;
-    private Runnable apiRunnable;
-    ScheduledExecutorService scheduleTaskExecutor;
-    Timer timerAsync;
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             if (mProgressDialog != null) {
@@ -90,13 +86,14 @@ public class MainActivity extends AppCompatActivity {
             try {
                 unzip(new File(Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DOWNLOADS + "/cache/" + LatestAssetFile), new File(targetDir + "/gallery/"));
                 loadFiles();
-                //TODO: moved restart of app to load files
-              //restartApp();
+                restartApp();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     };
+    private Handler scheduleHandler;
+    private Runnable apiRunnable;
 
     public static void unzip(File zipFile, File targetDirectory) throws IOException {
         ZipInputStream zis = new ZipInputStream(
@@ -140,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
         scheduleHandler = new Handler();
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        posterSlider =  findViewById(R.id.poster_slider);
-        emptyTextView =  findViewById(R.id.emptyTextView);
+        posterSlider = findViewById(R.id.poster_slider);
+        emptyTextView = findViewById(R.id.emptyTextView);
         emptyTextView.setText(R.string.no_files);
 
         //Removed default slider initialization
@@ -308,10 +305,10 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isNetworkAvailable() {
         try {
-            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             Log.e("isNetworkAvailable()", e.getLocalizedMessage());
             return false;
         }
@@ -347,9 +344,7 @@ public class MainActivity extends AppCompatActivity {
             emptyTextView.setVisibility(View.GONE);
             posterSlider.setPosters(posters);
         }
-
         LOADED_FILES = true;
-        restartApp();
     }
 
 
