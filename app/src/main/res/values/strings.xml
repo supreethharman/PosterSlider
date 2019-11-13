@@ -15,4 +15,5 @@
     <string name="latestAssetFile">latestAssetFile</string>
     <string name="serverIpAddress">http://13.232.40.50:8081</string>
     <string name="no_files">Sorry! there are no files for display.</string>
+    <string name="no_content_to_display">No content to display.</string>
 </resources>

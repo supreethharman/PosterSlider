@@ -137,13 +137,13 @@ public class MainActivity extends AppCompatActivity {
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         posterSlider =  findViewById(R.id.poster_slider);
         emptyTextView =  findViewById(R.id.emptyTextView);
-        emptyTextView.setText("Loading files...!");
+        emptyTextView.setText(R.string.no_content_to_display);
 
+        //Removed default slider initialization
         /*List<Poster> posters = new ArrayList<>();
         posters.add(new DrawableImage(R.drawable.logo));
-
-
         posterSlider.setPosters(posters);*/
+
         if (isNetworkAvailable()) {
             SharedPreferences prefs = getSharedPreferences(getString(R.string.sharedPrefsFile), MODE_PRIVATE);
             ServerAddress = prefs.getString(getString(R.string.serverAddress), "http://13.232.40.50");
@@ -284,9 +284,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }catch (NullPointerException e) {
+            Log.e("isNetworkAvailable()", e.getLocalizedMessage());
+            return false;
+        }
     }
 
     private void loadFiles() {
@@ -322,7 +327,6 @@ public class MainActivity extends AppCompatActivity {
 
         //deleteFilesWithPrefix(new File(targetDir + "/cache/"), HardwareKey);
         LOADED_FILES = true;
-        restartApp();
     }
 
 
@@ -353,6 +357,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        scheduleHandler.removeCallbacks(apiRunnable);
+        super.onStop();
+    }
 
     private class DownloadAssets extends AsyncTask<String, String, String> {
 
@@ -399,7 +408,6 @@ public class MainActivity extends AppCompatActivity {
         public boolean makePostRequest(String stringUrl, String payload) throws IOException {
             URL url = new URL(stringUrl);
             HttpURLConnection uc = (HttpURLConnection) url.openConnection();
-            StringBuffer jsonString = new StringBuffer();
             System.out.println(payload);
             uc.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             uc.setRequestMethod("POST");
