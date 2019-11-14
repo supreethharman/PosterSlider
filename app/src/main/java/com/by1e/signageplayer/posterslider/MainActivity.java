@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private String LatestAssetFile;
     private boolean LOADED_FILES = false;
     private boolean IS_DOWNLOADING = false;
+    private Handler handler;
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             if (mProgressDialog != null) {
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
         scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
         timerAsync = new Timer();
+        handler = new Handler();
 
         if (isNetworkAvailable()) {
             SharedPreferences prefs = getSharedPreferences(getString(R.string.sharedPrefsFile), MODE_PRIVATE);
@@ -327,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.no_files), Toast.LENGTH_LONG).show();
         } else {
             Arrays.sort(files);
-            List<Poster> posters = new ArrayList<>();
+            final List<Poster> posters = new ArrayList<>();
             for (File file : files) {
                 String extension = ch.getFileExt(file.getName());
                 if (ch.getImageExtensions().contains(extension)) {
@@ -342,7 +344,15 @@ public class MainActivity extends AppCompatActivity {
             Log.d("!!!LoadFiles!!!!!", "Posters: " + posters);
             posterSlider.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.GONE);
-            posterSlider.setPosters(posters);
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    posterSlider.setPosters(posters);
+                    handler.postDelayed(this, 8 * 60 * 1000);
+                }
+            });
+
         }
         LOADED_FILES = true;
     }
@@ -454,7 +464,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Log.d("***makePostRequest",NewAssetFile);
+                                Log.d("***makePostRequest", NewAssetFile);
                                 startDownload("http://13.232.40.50:8080/" + LatestAssetFile);
                             }
                         });
@@ -463,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString(getString(R.string.latestAssetFile), NewAssetFile);
                         LatestAssetFile = NewAssetFile;
                         editor.apply();
-                        Log.d("***makePostRequest","second else");
+                        Log.d("***makePostRequest", "second else");
                         //startDownload(ServerAddress+"/"+LatestAssetFile);
                         runOnUiThread(new Runnable() {
                             @Override
