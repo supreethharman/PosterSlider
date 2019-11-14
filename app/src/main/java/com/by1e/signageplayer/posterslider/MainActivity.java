@@ -328,17 +328,18 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Arrays.sort(files);
             List<Poster> posters = new ArrayList<>();
-            for (int i = 0; i < files.length; i++) {
-                String extension = ch.getFileExt(files[i].getName());
+            for (File file : files) {
+                String extension = ch.getFileExt(file.getName());
                 if (ch.getImageExtensions().contains(extension)) {
-                    posters.add(new RemoteImage("file:///" + files[i].getAbsolutePath()));
+                    posters.add(new RemoteImage("file:///" + file.getAbsolutePath()));
                 }
                 if (extension.equals("mp4")) {
-                    System.out.println("file:///" + files[i].getAbsolutePath());
-                    posters.add(new RemoteVideo(Uri.parse("file:///" + files[i].getAbsolutePath())));
+                    Log.d("", "file:///" + file.getAbsolutePath());
+                    posters.add(new RemoteVideo(Uri.parse("file:///" + file.getAbsolutePath())));
                 }
 
             }
+            Log.d("!!!LoadFiles!!!!!", "Posters: " + posters);
             posterSlider.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.GONE);
             posterSlider.setPosters(posters);
@@ -350,8 +351,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String child : children) {
+                boolean success = deleteDir(new File(dir, child));
                 if (!success) {
                     return false;
                 }
@@ -360,10 +361,10 @@ public class MainActivity extends AppCompatActivity {
         return dir.delete();
     }
 
-    public boolean deleteFile(File file) {
-        if (file.exists())
-            return file.delete();
-        return false;
+    public void deleteFile(File file) {
+        if (file.exists()) {
+            file.delete();
+        }
     }
 
     public void deleteFilesWithPrefix(File dir, String prefix) {
@@ -423,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
             return resp;
         }
 
-        public boolean makePostRequest(String stringUrl, String payload) throws IOException {
+        private boolean makePostRequest(String stringUrl, String payload) throws IOException {
             URL url = new URL(stringUrl);
             HttpURLConnection uc = (HttpURLConnection) url.openConnection();
             System.out.println(payload);
@@ -453,16 +454,16 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                System.out.println(NewAssetFile);
+                                Log.d("***makePostRequest",NewAssetFile);
                                 startDownload("http://13.232.40.50:8080/" + LatestAssetFile);
                             }
                         });
-                    } else if (NewAssetFile != null && NewAssetFile != "" && NewAssetFile.length() > 0 && !LatestAssetFile.equals(NewAssetFile)) {
+                    } else if (NewAssetFile != null && (!NewAssetFile.isEmpty()) && (NewAssetFile.length() > 0) && !LatestAssetFile.equals(NewAssetFile)) {
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString(getString(R.string.latestAssetFile), NewAssetFile);
                         LatestAssetFile = NewAssetFile;
                         editor.apply();
-                        System.out.println("second else");
+                        Log.d("***makePostRequest","second else");
                         //startDownload(ServerAddress+"/"+LatestAssetFile);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -487,8 +488,6 @@ public class MainActivity extends AppCompatActivity {
                     uc.disconnect();
                     return true;
                 }
-
-
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
