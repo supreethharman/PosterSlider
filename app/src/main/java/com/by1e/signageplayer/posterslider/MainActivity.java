@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.no_files), Toast.LENGTH_LONG).show();
         } else {
             Arrays.sort(files);
-            final List<Poster> posters = new ArrayList<>();
+            List<Poster> posters = new ArrayList<>();
             for (File file : files) {
                 String extension = ch.getFileExt(file.getName());
                 if (ch.getImageExtensions().contains(extension)) {
@@ -344,11 +344,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d("!!!LoadFiles!!!!!", "Posters: " + posters);
             posterSlider.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.GONE);
+            posterSlider.setPosters(posters);
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    posterSlider.setPosters(posters);
+                    Log.d("!!!Load Runnable!!!!!", "added delay Runnable");
+                    loadFiles();
                     handler.postDelayed(this, 8 * 60 * 1000);
                 }
             });
